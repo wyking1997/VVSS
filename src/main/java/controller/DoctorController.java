@@ -1,19 +1,20 @@
 package controller;
 
+import exceptions.ConsultationException;
+import exceptions.PatientException;
+import model.Consultation;
+import model.Patient;
+import repository.Repository;
+import validator.PatientValidation;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-
-import exceptions.ConsultationException;
-import exceptions.PatientException;
-import repository.Repository;
-import validator.PatientValidation;
-import model.Consultation;
-import model.Patient;
+import java.util.Map;
 
 public class DoctorController {
 
-	private List<Patient> PatientList;
+	private Map<String, Patient> patients;
 	private List<Consultation> ConsultationList;
 	private Repository rep;
 
@@ -21,14 +22,14 @@ public class DoctorController {
 
 	public DoctorController(Repository rep) {
 		this.rep = rep;
-		this.PatientList = rep.getPatientList();
+		this.patients = rep.getPatientList();
 		this.ConsultationList = rep.getConsultationList();
 		// Get list from file in order to avoid duplicates.
 	}
 
 	/** Getters */
 	public List<Patient> getPatientList() {
-		return PatientList;
+		return new ArrayList<Patient>(patients.values());
 	}
 
 	public List<Consultation> getConsultationList() {
@@ -39,13 +40,11 @@ public class DoctorController {
 		ConsultationList = consultationList;
 	}
 
-	public int getPatientBySSN(String SSN) {
-		for (int i = 0; i < PatientList.size(); i++) {
-			if (PatientList.get(i).getSSN().equals(SSN))
-				return i;
-		}
-
-		return -1;
+	public Patient getPatientBySSN(String ssn) {
+		for (String id : patients.keySet())
+			if (patients.get(id).getSSN().equals(ssn))
+				return patients.get(id);
+		return null;
 	}
 
 	public int getConsByID(String ID) {
@@ -69,6 +68,8 @@ public class DoctorController {
 
 	/** Others */
 	public void addPatient(Patient p) throws PatientException {
+	    if (patients.get(p.getPatient_ID()) != null)
+            throw new PatientException("Not unique id");
 		if (p.getName() != null && p.getSSN() != null && p.getAddress() != null) {
 			PatientValidation.nameValidate(p.getName());
 			PatientValidation.ssnValidate(p.getSSN());
@@ -76,7 +77,7 @@ public class DoctorController {
 		} else {
 			throw new PatientException("Null fields");
 		}
-		PatientList.add(p);
+		patients.put(p.getPatient_ID(), p);
 		try {
 			rep.savePatientToFile(p);
 		} catch (IOException e) {
@@ -94,7 +95,7 @@ public class DoctorController {
 
 		if (consID != null && patientSSN != null
 				&& diag != null && meds.size() != 0
-				&& this.getPatientBySSN(patientSSN) > -1
+				&& this.getPatientBySSN(patientSSN) != null
 				&& this.getConsByID(consID) == -1) {
 			Consultation c = new Consultation(consID, patientSSN, diag, meds, date);
 			ConsultationList.add(c);
@@ -105,8 +106,7 @@ public class DoctorController {
 			}
 
 			Patient p;
-			p = this.getPatientList().get(
-					this.getPatientBySSN(c.getPatientSSN()));
+			p = patients.get(c.getPatientSSN());
 			p.setConsNum(p.getConsNum() + 1);
 		}
 		else {
@@ -125,24 +125,15 @@ public class DoctorController {
 			int chk = 1;
 
 			for (int i = 0; i < c.size(); i++) {
-				if (c.get(i).getDiag().toLowerCase()
-						.contains(disease.toLowerCase())) // so that it is case
-															// insensitive
-				{
-					for (int j = 0; j < p.size(); j++) // verify patient was
-															// not already added
-					{
+				if (c.get(i).getDiag().toLowerCase().contains(disease.toLowerCase())){
+					for (int j = 0; j < p.size(); j++){
 						if (p.get(j).getSSN().equals(c.get(i).getPatientSSN())) {
 							chk = p.get(j).getConsNum();
 						}
 					}
 
 					if (chk == 1) {
-						p.add(this.getPatientList().get(
-								this.getPatientBySSN(c.get(i).getPatientSSN()))); // get
-																					// Patient
-																					// by
-																					// SSN
+						p.add(patients.get(c.get(i).getPatientSSN()));																// SSN
 					}
 					chk = 1;
 				}
@@ -151,7 +142,6 @@ public class DoctorController {
 			// Sort the list
 
 			Patient paux = new Patient();
-
 			for (int i = 0; i < p.size(); i++)
 				for (int j = i + 1; j < p.size() - 1; j++)
 					if (p.get(j - 1).getConsNum() < p.get(j).getConsNum()) {
@@ -165,11 +155,4 @@ public class DoctorController {
 		}
 		return p;
 	}
-
-	/*
-	 * For debugging purposes public void printList() { for (int i = 0; i <
-	 * PatientList.size(); i++) {
-	 * System.out.println(PatientList.get(i).toString()); } }
-	 */
-
 }

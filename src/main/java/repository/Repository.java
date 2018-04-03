@@ -7,7 +7,9 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import model.Consultation;
 import model.Patient;
@@ -98,9 +100,9 @@ public class Repository {
 		return la;
 	}
 	
-	public List<Patient> getPatientList()
+	public Map<String, Patient> getPatientList()
 	{
-		List<Patient> lp = new ArrayList<Patient>();
+		Map<String, Patient> patients = new HashMap<String, Patient>();
 		try {
 			String[] tokens = getPatientsFromFile();
 			
@@ -111,7 +113,7 @@ public class Repository {
 			{ 
 				tok = tokens[i];
 				pat = tok.split(",");
-				lp.add(new Patient(pat[0],pat[1],pat[2]));	
+				patients.put(pat[0],new Patient(pat[0],pat[1],pat[2]));
 				i = i + 1;
 			}
 			
@@ -119,7 +121,7 @@ public class Repository {
 			e.printStackTrace();
 		}
 		
-		return lp;	
+		return patients;
 	}
 	
 	public List<Consultation> getConsultationList()
