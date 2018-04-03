@@ -174,7 +174,7 @@ public class Repository {
 		in.close(); // append
 		FileWriter fw=new FileWriter(patients);
 		PrintWriter out=new PrintWriter(fw);
-		for (i=1; i<sl.length-1; i++)
+		for (i=0; i<sl.length; i++)
 			out.println(sl[i]);
 		out.println(p.toString());
 		out.close();
@@ -182,25 +182,24 @@ public class Repository {
 	
 	public void saveConsultationToFile(Consultation c) throws IOException		// save to file
 	{
-		int n=0;
-		BufferedReader in = new BufferedReader(new FileReader(consultations));
-		while((in.readLine())!=null)
-			n++;
-		in.close();
-		String[] sl=new String[n];
+		BufferedReader in;
+		List<String> strings = new ArrayList<String>();
 		String str;
 		int i=0;
 		in = new BufferedReader(new FileReader(consultations));
-		while((str=in.readLine())!=null)
-		{
-			sl[i] = str;
+
+		while((str=in.readLine())!=null) {
+			strings.add(str);
 			i++;
 		}
-		in.close(); // append
+
+		in.close();
 		FileWriter fw=new FileWriter(consultations);
 		PrintWriter out=new PrintWriter(fw);
-		for (i=0; i<sl.length-1; i++)
-			out.println(sl[i]);
+
+		for (i=0; i<strings.size(); i++)
+			out.println(strings.get(i));
+
 		out.println(c.toString());
 		out.close();
 	}

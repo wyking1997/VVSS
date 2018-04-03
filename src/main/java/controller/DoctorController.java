@@ -104,7 +104,7 @@ public class DoctorController {
 				e.printStackTrace();
 			}
 
-			Patient p = new Patient();
+			Patient p;
 			p = this.getPatientList().get(
 					this.getPatientBySSN(c.getPatientSSN()));
 			p.setConsNum(p.getConsNum() + 1);
