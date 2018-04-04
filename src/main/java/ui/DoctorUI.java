@@ -1,5 +1,6 @@
 package ui;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
@@ -130,6 +131,8 @@ public class DoctorUI {
 					ctrl.addConsultation(consID, patientSSN, diag, meds, date);
 				} catch (ConsultationException e) {
 					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (IOException e) {
 					e.printStackTrace();
 				}
 				System.out.println("> Consultation (" + consID + ") has been successfully added.");

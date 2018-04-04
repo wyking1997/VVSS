@@ -89,7 +89,7 @@ public class DoctorController {
 	// diagnostic, prescription drugs)
 
 	public void addConsultation(String consID, String patientSSN, String diag,
-			List<String> meds, String date) throws ConsultationException {
+			List<String> meds, String date) throws ConsultationException, IOException {
 		if (meds == null)
 			throw new ConsultationException("meds is null");
 
@@ -99,11 +99,8 @@ public class DoctorController {
 				&& this.getConsByID(consID) == -1) {
 			Consultation c = new Consultation(consID, patientSSN, diag, meds, date);
 			ConsultationList.add(c);
-			try {
-				rep.saveConsultationToFile(c);
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
+
+			rep.saveConsultationToFile(c);
 
 			Patient p;
 			p = patients.get(c.getPatientSSN());
