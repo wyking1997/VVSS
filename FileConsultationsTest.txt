@@ -1,2 +1,0 @@
-unique_id,1112211122111,this is diag,vit c,01.01.2019
-unique_id,1112211122111,this is diag,vit c,01.01.2019
