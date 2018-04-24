@@ -11,7 +11,7 @@ import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 
-public class AddConsultation {
+public class AddConsultationTest {
     @Test
     public void addConsultationMedsNull() {
         assertEquals(1, 1);
